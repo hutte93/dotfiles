@@ -5,10 +5,6 @@
 # this file and re-run i3-config-wizard(1).
 #
 
-# disable borders
-#new_window 1pixel
-#hide_edge_borders both
-
 # i3 config file (v4)
 #
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
@@ -22,21 +18,23 @@ font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 # clear in small sizes. However, if you need a lot of unicode glyphs or
 # right-to-left text rendering, you should instead use pango for rendering and
 # chose a FreeType font, such as:
-font pango:System San Francisco Display 10
+# font pango:DejaVu Sans Mono 10
 
 # variables for colors
-set $bg-color            #2f343f
-set $inactive-bg-color   #2f343f
-set $text-color          #f3f4f5
-set $inactive-text-color #676E7D
-set $urgent-bg-color     #E53935
+#set $bg-color		 #2f343f
+#set $inactive-bg-color	 #2f343f
+#set $text-color		 #f3f4f5
+#set $inactive-text-color #676E7D
+#set $urgent-bg-color	 #E53935s
+set $hibernate sudo -A systemctl suspend
+set $shutdown sudo -A shutdown -h now
 
 # window colors
-#                       border             background         text                 indicator
-client.focused          $bg-color          $bg-color          $text-color          #00ff00
-client.unfocused        $inactive-bg-color $inactive-bg-color $inactive-text-color #00ff00
-client.focused_inactive $inactive-bg-color $inactive-bg-color $inactive-text-color #00ff00
-client.urgent           $urgent-bg-color   $urgent-bg-color   $text-color          #00ff00
+#			border			background		text			indicator
+#client.focused		$bg-color		$bg-color		$text-color		#00ff00
+#client.unfocused	$inactive-bg-color	$inactive-bg-color	$inactive-text-color	#00ff00
+#client.focused_inactive $inactive-bg-color	$inactive-bg-color	$inactive-text-color	#00ff00
+#client.urgent		$urgent-bg-color	$urgent-bg-color	$text-color		#00ff00
 
 hide_edge_borders both
 
@@ -46,16 +44,20 @@ floating_modifier $mod
 # start a terminal
 bindsym $mod+Return exec xterm
 
-#lock screen
-bindsym Ctrl+$mod+l exec --no-startup-id lock
+# bind some program shortcuts
+bindsym $mod+F4 exec --no-startup-id prompt "Hibernate computer?" "$hibernate"
+bindsym $mod+shift+x exec --no-startup-id prompt "Shutdown computer?" "$shutdown"
+bindsym XF86ScreenSaver exec --no-startup-id lock
+bindsym $mod+w exec --no-startup-id firefox
+bindsym $mod+e exec --no-startup-id ranger
+bindsym $mod+F9 exec --no-startup-id dmenumount
+bindsym $mod+F10 exec --no-startup-id dmenuumount
 
 # kill focused window
 bindsym $mod+c  kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run -nb black -sb tomato -l 10
-#bindsym $mod+d exec rofi -show run -lines 3 -eh 2 -width 100 -opacity "85" -bw 0 -bc $bg-color -bg $bg-color -fg $text-color -hlbg $bg-color -hlfg "#9575cd" -font "System San Francisco Display 18"
-
+bindsym $mod+d exec dmenu_run
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -95,9 +97,9 @@ bindsym $mod+v split v
 bindsym $mod+f fullscreen
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+s layout stacking
-bindsym $mod+w layout tabbed
-bindsym $mod+e layout toggle split
+#bindsym $mod+s layout stacking
+#bindsym $mod+w layout tabbed
+#bindsym $mod+e layout toggle split
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
@@ -112,10 +114,10 @@ bindsym $mod+a focus parent
 #bindsym $mod+d focus child
 
 # variables for workspaces
-set $w1 "1: Terminal"
-set $w2 "2: Firefox"
-set $w3 "3: Mutt"
-set $w10 "10: Spotify"
+set $w1 1-term
+set $w2 2-www
+set $w3 3-dev
+set $w10 10-vga
 
 # switch to workspace
 bindsym $mod+1 workspace $w1
@@ -140,9 +142,6 @@ bindsym $mod+Shift+7 move container to workspace 7
 bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace $w10
-
-# assign programs on specific workspaces
-assign [class="Rhythmbox"] $w10
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -181,61 +180,33 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         status_command i3status
-        colors {
-                background $bg-color
-                separator #757575
-                #                  border             background         text
-                focused_workspace  $bg-color          $bg-color          $text-color
-                inactive_workspace $inactive-bg-color $inactive-bg-color $inactive-text-color
-                urgent_workspace   $urgent-bg-color   $urgent-bg-color   $text-color
-        }
+	mode dock
 }
 
 # auto-beamer
+#workspace "$w10" output VGA1
 #exec_always --no-startup-id xrandr --output VGA1 --mode 1920x1080 
 #exec_always --no-startup-id xrandr --output LVDS1 --mode 1600x900 --left-of VGA1 
 
 # audio
-bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -q sset Master 5%+unmute
-bindsym XF86AudioLowerVolume exec --no-startup-id amixer -q sset Master 5%-unmute
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -q set Master 5%+ unmute
+bindsym XF86AudioLowerVolume exec --no-startup-id amixer -q set Master 5%- unmute
 bindsym XF86AudioMute exec --no-startup-id amixer set Master toggle
 bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 bindsym XF86AudioMicMute exec amixer set Capture toggle
 
-# screen brightness controls
-bindsym XF86MonBrightnessUp exec xbacklight -inc 10
-bindsym XF86MonBrightnessDown exec xbacklight -dec 10
-bindsym XF86Launch1 exec xbacklight -set 100
+# brightness
+bindsym XF86MonBrightnessUp exec light -A 10
+bindsym XF86MonBrightnessDown exec light -U 10
+bindsym XF86Launch1 exec light -S 100
+
+# set background image
+exec_always feh --bg-scale /home/patrick/Pictures/debian.jpg
 
 # autostart
 exec --no-startup-id xautolock -time 100 -locker lock
 exec_always --no-startup-id xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 1
 exec_always --no-startup-id xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 2
 exec_always --no-startup-id xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Axes" 6 7 4 5
-
-# autostart programs on workspaces
-exec --no-startup-id xterm
-
-# set wallpaper
-exec_always feh --bg-scale /home/hutte/Pictures/pr0.png
-
-# set resolution for LVDS1 and VGA1
-exec_always xrandr --output LVDS1 --mode 1600x900 --pos 1920x112 --rotate normal --outp    ut VGA1 --mode 1920x1080 --pos 0x0 --rotate normal
-
-# variables for colors
-set $bg-color            #2f343f
-set $inactive-bg-color   #2f343f
-set $text-color          #f3f4f5
-set $inactive-text-color #676E7D
-set $urgent-bg-color     #E53935
-
-# window colors
-#                       border             background         text                 indicator
-client.focused          $bg-color          $bg-color          $text-color          #00ff00
-client.unfocused        $inactive-bg-color $inactive-bg-color $inactive-text-color #00ff00
-client.focused_inactive $inactive-bg-color $inactive-bg-color $inactive-text-color #00ff00
-client.urgent           $urgent-bg-color   $urgent-bg-color   $text-color          #00ff00
-
-hide_edge_borders both
